@@ -230,7 +230,7 @@ ALTER TABLE `Ticket` ADD CONSTRAINT `Ticket_tenantId_fkey` FOREIGN KEY (`tenantI
 -- Insert seed data
 INSERT INTO `Tenant` (`id`, `name`, `plan`, `createdAt`, `updatedAt`) VALUES ('default-tenant', 'Minha Empresa', 'starter', NOW(), NOW());
 
-INSERT INTO `User` (`id`, `email`, `name`, `password`, `role`, `tenantId`, `createdAt`, `updatedAt`) VALUES ('admin-1', 'admin@sociallens.com.br', 'Administrador', '$2a$10$abcdefghijklmnopqrstuvwxyz', 'admin', 'default-tenant', NOW(), NOW());
+INSERT INTO `User` (`id`, `email`, `name`, `password`, `role`, `tenantId`, `createdAt`, `updatedAt`) VALUES ('admin-1', 'grsolucoesweb@gmail.com', 'Admin', '$2a$10$yislx9X.kOZ5mfSqBFvZ9ucBySQaSvwwfIOdih3AlFvvBlAc3sRh6', 'admin', 'default-tenant', NOW(), NOW());
 
 INSERT INTO `Project` (`id`, `name`, `description`, `status`, `sources`, `tenantId`, `createdAt`, `updatedAt`) VALUES ('project-1', 'Minha Marca', 'Monitoramento da marca principal', 'active', '["twitter","instagram","facebook"]', 'default-tenant', NOW(), NOW());
 

@@ -1,3 +1,8 @@
+'use client';
+
+import { useState } from 'react';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -5,6 +10,31 @@ export const metadata: Metadata = {
 };
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
+
+    if (result?.error) {
+      setError('E-mail ou senha inválidos');
+      setLoading(false);
+    } else {
+      router.push('/dashboard');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-surface-900 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
@@ -19,21 +49,32 @@ export default function LoginPage() {
         </div>
 
         <div className="card p-8 rounded-2xl">
-          <form className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+                {error}
+              </div>
+            )}
             <div>
               <label className="block text-surface-400 text-sm mb-2">E-mail</label>
               <input 
                 type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="input-field" 
                 placeholder="seu@email.com"
+                required
               />
             </div>
             <div>
               <label className="block text-surface-400 text-sm mb-2">Senha</label>
               <input 
                 type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="input-field" 
                 placeholder="••••••••"
+                required
               />
             </div>
             <div className="flex items-center justify-between">
@@ -45,8 +86,12 @@ export default function LoginPage() {
                 Esqueci minha senha
               </a>
             </div>
-            <button type="submit" className="btn-primary w-full">
-              Entrar
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="btn-primary w-full disabled:opacity-50"
+            >
+              {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
 
