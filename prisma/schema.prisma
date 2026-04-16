@@ -1,0 +1,197 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id            String    @id @default(cuid())
+  name          String
+  plan          String    @default("starter")
+  logo          String?
+  primaryColor  String    @default("#6366f1")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  users         User[]
+  projects      Project[]
+  mentions      Mention[]
+  tags          Tag[]
+  alerts        Alert[]
+  reports       Report[]
+  tickets       Ticket[]
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  password      String
+  role          String    @default("user")
+  avatar        String?
+  phone         String?
+  jobTitle      String?
+  status        String    @default("active")
+  lastActiveAt  DateTime?
+  tenantId      String
+  tenant        Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([tenantId])
+  @@index([email])
+}
+
+model Project {
+  id            String    @id @default(cuid())
+  name          String
+  description   String?
+  status        String    @default("active")
+  keywords      Keyword[]
+  sources       String[]
+  tenantId      String
+  tenant        Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  mentions      Mention[]
+  reports       Report[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([tenantId])
+}
+
+model Keyword {
+  id            String    @id @default(cuid())
+  term          String
+  projectId     String
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+
+  @@index([projectId])
+}
+
+model Mention {
+  id            String    @id @default(cuid())
+  content       String
+  source        String
+  author        String
+  authorUrl     String?
+  authorImage   String?
+  sentiment     String    @default("neutro")
+  confidence    Float?
+  emotion       String?
+  url           String
+  publishedAt   DateTime
+  projectId     String
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tenantId      String
+  tenant        Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tags          MentionTag[]
+  createdAt     DateTime  @default(now())
+
+  @@index([tenantId])
+  @@index([projectId])
+  @@index([sentiment])
+  @@index([source])
+  @@index([publishedAt])
+}
+
+model Tag {
+  id            String    @id @default(cuid())
+  name          String
+  color         String    @default("#6366f1")
+  tenantId      String
+  tenant        Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  mentions      MentionTag[]
+  createdAt     DateTime  @default(now())
+
+  @@index([tenantId])
+}
+
+model MentionTag {
+  mentionId     String
+  tagId         String
+  mention       Mention   @relation(fields: [mentionId], references: [id], onDelete: Cascade)
+  tag           Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([mentionId, tagId])
+}
+
+model Alert {
+  id            String    @id @default(cuid())
+  type          String
+  title         String
+  message       String
+  urgent        Boolean   @default(false)
+  read           Boolean   @default(false)
+  mentionId     String?
+  projectId     String?
+  tenantId      String
+  tenant        Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+
+  @@index([tenantId])
+  @@index([read])
+}
+
+model AlertRule {
+  id            String    @id @default(cuid())
+  name          String
+  type          String
+  condition     Json
+  status        String    @default("active")
+  triggerCount  Int       @default(0)
+  tenantId      String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Report {
+  id            String    @id @default(cuid())
+  name          String
+  type          String
+  schedule      String?
+  format        String
+  projectId     String
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tenantId      String
+  tenant        Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  lastGenerated DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([tenantId])
+}
+
+model Ticket {
+  id                String    @id @default(cuid())
+  protocol          String    @unique
+  subject           String
+  message           String
+  author            String
+  authorAvatar      String?
+  status            String    @default("open")
+  sentiment         String?
+  assignedTo        String?
+  firstResponseAt   DateTime?
+  resolvedAt        DateTime?
+  tenantId          String
+  tenant            Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([tenantId])
+  @@index([status])
+}
+
+model Integration {
+  id            String    @id @default(cuid())
+  name          String
+  type          String
+  config        Json
+  status        String    @default("inactive")
+  tenantId      String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
