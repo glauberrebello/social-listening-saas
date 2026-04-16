@@ -1,16 +1,9 @@
-import type { Metadata } from 'next';
-import './globals.css';
-
-export const metadata: Metadata = {
-  title: 'SocialLens - Login',
-};
-
-export default function LoginTest() {
+export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-surface-900 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-white mb-4">Servidor está funcionando!</h1>
-        <p className="text-surface-400">Se você能看到 isso，说明 Next.js está rodando.</p>
+    <div style={{ minHeight: '100vh', background: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ textAlign: 'center' }}>
+        <h1 style={{ color: 'white', fontSize: '2rem', marginBottom: '1rem' }}>Servidor funcionando!</h1>
+        <p style={{ color: '#94a3b8' }}>Next.js está rodando.</p>
       </div>
     </div>
   );
