@@ -3,11 +3,6 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Login - SocialLens',
-};
 
 export default function LoginPage() {
   const router = useRouter();
